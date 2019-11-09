@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!--配置代理的service-->
+    <bean id="proxyAccountService" factory-bean="beanFactory" factory-method="getAccountService"></bean>
+
+    <bean id="beanFactory" class="com.aia.factory.BeanFactory">
+            <property name="accountService" ref="accountService"></property>
+            <property name="txManager" ref="txManager"></property>
+    </bean>
+
+    <bean id="accountService" class="com.aia.service.impl.AccountServiceImpl">
+        <property name="accountDao" ref="accountDao"></property>
+
+    </bean>
+
+    <bean id="accountDao" class="com.aia.dao.impl.AccountDaoImpl">
+        <property name="runner" ref="runner"></property>
+        <property name="connectionUtils" ref="connectionUtils"></property>
+    </bean>
+
+    <bean id="runner" class="org.apache.commons.dbutils.QueryRunner" scope="prototype"></bean>
+
+    <!-- 配置数据源 -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <!--连接数据库的必备信息-->
+        <property name="driverClass" value="com.mysql.jdbc.Driver"></property>
+        <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/easy"></property>
+        <property name="user" value="root"></property>
+        <property name="password" value="995999aa"></property>
+    </bean>
+
+    <bean id="connectionUtils" class="com.aia.utils.ConnectionUtils">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+<!--    配置事务管理类-->
+    <bean id="txManager" class="com.aia.utils.TransactionManager">
+        <property name="connectionUtils" ref="connectionUtils"></property>
+    </bean>
+</beans>
